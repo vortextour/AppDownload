@@ -4,9 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vortex Tour - Download</title>
+    
     <!-- Futuristic Gaming Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- === AUTO EXTERNAL BROWSER REDIRECT FOR FB/MESSENGER === -->
+    <script>
+        (function autoRedirectToChrome() {
+            var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            var isFB = (userAgent.indexOf("FBAN") > -1) || (userAgent.indexOf("FBAV") > -1) || (userAgent.indexOf("Messenger") > -1);
+            var isAndroid = /android/i.test(userAgent);
+
+            if (isFB) {
+                if (isAndroid) {
+                    // Android devices auto-redirect
+                    var currentUrl = window.location.href.replace('https://', '').replace('http://', '');
+                    var chromeIntent = "intent://" + currentUrl + "#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=com.android.chrome;end;";
+                    var defaultIntent = "intent://" + currentUrl + "#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end;";
+
+                    // প্রথমে ক্রোমে খোলার ট্রাই করবে
+                    window.location.replace(chromeIntent);
+
+                    // ক্রোম না থাকলে অন্য ডিফল্ট ব্রাউজারে পাঠাবে
+                    setTimeout(function() {
+                        window.location.replace(defaultIntent);
+                    }, 1000);
+                } else {
+                    // iOS বা অন্যান্য ডিভাইসের জন্য ম্যানুয়াল পপআপ (যেহেতু iOS এ Intent কাজ করে না)
+                    alert("ফেসবুক বা মেসেঞ্জার থেকে সরাসরি অ্যাপ ডাউনলোড করা যায় না।\n\nউপরে ডানদিকের থ্রি-ডট (⋮) মেনুতে ক্লিক করে 'Open in external Browser' বা 'Safari' সিলেক্ট করুন।");
+                }
+            }
+        })();
+    </script>
     
     <style>
         /* === BASE & CSS RESET === */
@@ -275,7 +305,7 @@
         window.addEventListener('resize', initCanvas);
         initCanvas(); animateCanvas();
 
-        // === 3D CARD TILT (Gyroscope Reduced for User Comfort) ===
+        // === 3D CARD TILT ===
         const card = document.getElementById('glass-card');
         const cursorFlare = document.getElementById('cursor-flare');
 
@@ -287,7 +317,6 @@
             mouse.x = e.clientX; mouse.y = e.clientY;
         });
 
-        // Gyroscope Effect Reduced Significantly (10 -> 3.5)
         window.addEventListener("deviceorientation", (e) => {
             if (e.beta && e.gamma) {
                 targetX = width/2 + (e.gamma * 3.5); 
@@ -303,8 +332,6 @@
             cursorFlare.style.left = `${currentX}px`; cursorFlare.style.top = `${currentY}px`;
 
             const centerX = width / 2; const centerY = height / 2;
-            
-            // Reduced max rotation from 12 degrees to 3.5 degrees (Very subtle tilt)
             const rotateY = ((currentX - centerX) / centerX) * 3.5; 
             const rotateX = -((currentY - centerY) / centerY) * 3.5; 
 
@@ -313,18 +340,10 @@
         }
         updateInteractions();
 
-        // === BUTTON RIPPLE & MESSENGER BROWSER FIX ===
+        // === BUTTON RIPPLE (ALERTS REMOVED, REDIRECT HANDLED ON PAGE LOAD) ===
         const btn = document.getElementById('cta-btn');
         btn.addEventListener('click', function(e) {
             
-            // Messenger In-App Browser Check Fix
-            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-            if (userAgent.indexOf("FBAN") > -1 || userAgent.indexOf("FBAV") > -1 || userAgent.indexOf("Messenger") > -1) {
-                e.preventDefault(); 
-                alert("ফেসবুক বা মেসেঞ্জার থেকে সরাসরি অ্যাপ ডাউনলোড করা যায় না।\n\nউপরে ডানদিকের থ্রি-ডট (⋮) মেনুতে ক্লিক করে 'Open in Chrome' বা 'Open in external Browser' সিলেক্ট করুন এবং তারপর ডাউনলোড করুন।");
-                return; // Stop animation if blocked
-            }
-
             // Ripple Animation
             let ripple = document.createElement('div');
             ripple.classList.add('ripple');
